@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Hello World, MoViSign!</string>
+    <string name="app_name">MoViSign</string>
+<string name="xlabel">X: </string>
+<string name="ylabel">Y: </string>
+<string name="zlabel">Z:</string>
+<string name="noAccelerometer">There is no Accelerometer on this device!</string>
+<string name="accuracyUnreliable">The accuracy of the accelerometer is very unreliable now!</string>
+<string name="accuracyLow">Low Accurary</string>
+<string name="accuracyHigh">High accuracy</string>
+<string name="accuracyMedium">Medium Accuracy</string>
+</resources>
