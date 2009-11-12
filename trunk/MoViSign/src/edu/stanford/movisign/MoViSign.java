@@ -10,8 +10,8 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.util.Log;
-//import android.view.View;
-//import android.view.View.OnClickListener;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -28,7 +28,7 @@ public class MoViSign extends Activity {
     private List<Sensor> sensors;
     private Sensor accSensor;
     private float oldX, oldY, oldZ = 0f; 
-    private boolean logging;
+    private boolean logging = false;
     
   	public static volatile float kFilteringFactor = (float)0.05;
 	public static volatile float direction = (float) 0;
@@ -40,21 +40,24 @@ public class MoViSign extends Activity {
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("movisign", "onCreate");
-        Log.e("error", "onCreate");
 
         setContentView(R.layout.main);
         accuracyLabel = (TextView) findViewById(R.id.accuracyLabel);
         xLabel = (TextView) findViewById(R.id.xLabel);
         yLabel = (TextView) findViewById(R.id.yLabel);
         zLabel = (TextView) findViewById(R.id.zLabel);
-        /*startLogButton = (Button) findViewById(R.id.ButtonStartLog);
-        startLogButton.setOnClickListener(new OnClickListener(){
+        startLogButton = (Button) findViewById(R.id.ButtonStartLog);
+        /*startLogButton.setOnClickListener(new OnClickListener(){
         	public void onClick(View v) {
-        	    //finish();
+        	    logging = true;
         	  }
-        });
-        stopLogButton = (Button) findViewById(R.id.ButtonStopLog);*/
+        });*/
+        stopLogButton = (Button) findViewById(R.id.ButtonStopLog);
+        /*stopLogButton.setOnClickListener(new OnClickListener(){
+        	public void onClick(View v) {
+        	    logging = false;
+        	  }
+        });*/
         directionLabel = (TextView) findViewById(R.id.directionLabel);
         inclinationLabel = (TextView) findViewById(R.id.inclinationLabel);
         aboveBelowLabel = (TextView) findViewById(R.id.aboveBelowLabel);
@@ -109,8 +112,7 @@ public class MoViSign extends Activity {
 
     	 public void onSensorChanged(SensorEvent event)
 	     {
-   	      Log.e("error", "onSensorChanged");
-    		 /*float vals[] = event.values;
+    		  float vals[] = event.values;
 	          if(event.sensor.getType() == Sensor.TYPE_ORIENTATION)
 	          {
 	             float rawDirection = vals[0];
@@ -137,19 +139,15 @@ public class MoViSign extends Activity {
 
 	             }
 	             
-	          }*/
+	          }
     		 if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
              {
-                /*aboveOrBelow =
+                aboveOrBelow =
                    (float) ((vals[2] * kFilteringFactor) + 
-                   (aboveOrBelow * (1.0 - kFilteringFactor)));*/
+                   (aboveOrBelow * (1.0 - kFilteringFactor)));
   	            updateScreen(event.values[SensorManager.DATA_X],
 	                    event.values[SensorManager.DATA_Y],
 	                    event.values[SensorManager.DATA_Z], direction, inclination, aboveOrBelow);
-  	            Log.d("movisign" , "vals " + event.values[SensorManager.DATA_X] + ", " 
-  	        		  	+ event.values[SensorManager.DATA_Y] + ", "+ event.values[SensorManager.DATA_Z]);
-  	            Log.e("errors" , "vals " + event.values[SensorManager.DATA_X] + ", " 
-	        		  	+ event.values[SensorManager.DATA_Y] + ", "+ event.values[SensorManager.DATA_Z]);
              }
 
 	     }
