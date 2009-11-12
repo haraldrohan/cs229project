@@ -12,7 +12,7 @@
 <TextView 
 	android:layout_width="wrap_content" 
 	android:layout_height="wrap_content" 
-	android:text="@string/xlabel" android:id="@+id/accuracyLabel"
+	android:text="@string/accuracylabel" android:id="@+id/accuracyLabel"
 	/>
 <TextView 
 	android:layout_width="wrap_content" 
@@ -31,5 +31,21 @@
 	android:layout_height="wrap_content" 
 	android:text="@string/zlabel" android:id="@+id/zLabel"
 	/>
+
+<TextView android:text="@string/directionLabel" 
+		  android:id="@+id/directionLabel" 
+		  android:layout_width="wrap_content" 
+		  android:layout_height="wrap_content"></TextView>
+
+<TextView android:text="@string/inclinationLabel" 
+		  android:id="@+id/inclinationLabel" 
+		  android:layout_width="wrap_content" 
+		  android:layout_height="wrap_content"></TextView>
+
+<TextView android:text="@string/aboveBelowLabel" 
+		  android:id="@+id/aboveBelowLabel" 
+		  android:layout_width="wrap_content" 
+		  android:layout_height="wrap_content"></TextView>
+
 
 </LinearLayout>

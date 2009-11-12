@@ -10,4 +10,11 @@
 <string name="accuracyLow">Low Accurary</string>
 <string name="accuracyHigh">High accuracy</string>
 <string name="accuracyMedium">Medium Accuracy</string>
+<string name="accuracylabel">accuracy:</string>
+<string name="Null">N/A</string>
+<string name="directionLabel">Direction</string>
+<string name="inclinationLabel">Inclination:</string>
+<string name="aboveBelowLabel">Up/Down:</string>
+<string name="StartLog">Start Logging</string>
+<string name="StopLog">Stop Logging</string>
 </resources>
