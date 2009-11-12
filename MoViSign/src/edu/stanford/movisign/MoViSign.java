@@ -73,10 +73,10 @@ public class MoViSign extends Activity {
        
     	sensorMgr.registerListener(mySensorListener,
  			   sensorMgr.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
- 			   SensorManager.SENSOR_DELAY_UI);
+ 			   SensorManager.SENSOR_DELAY_FASTEST);
     	sensorMgr.registerListener(mySensorListener, 
- 			sensorMgr.getDefaultSensor(Sensor.TYPE_ORIENTATION), 
- 			SensorManager.SENSOR_DELAY_UI);
+    		   sensorMgr.getDefaultSensor(Sensor.TYPE_ORIENTATION), 
+ 			   SensorManager.SENSOR_DELAY_FASTEST);
 
 
 
