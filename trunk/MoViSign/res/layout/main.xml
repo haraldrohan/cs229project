@@ -47,14 +47,11 @@
 		  android:layout_width="wrap_content" 
 		  android:layout_height="wrap_content"></TextView>
 
-<Button android:id="@+id/ButtonStartLog" 
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" 
-		android:text="@string/StartLog"></Button>
-		
-<Button android:id="@+id/ButtonStopLog" 
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" 
-		android:text="@string/StopLog"></Button>
-
+<ToggleButton android:id="@+id/ToggleButton01" 
+			  android:layout_width="wrap_content" 
+			  android:layout_height="wrap_content" 
+			  android:textOff="@string/startlog" 
+			  android:textOn="@string/stoplog"
+			  android:clickable="true"
+			  android:soundEffectsEnabled="true"></ToggleButton>
 </LinearLayout>
