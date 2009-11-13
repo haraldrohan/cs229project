@@ -4,7 +4,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
+
 import android.app.Activity;
 import android.content.Context;
 import android.hardware.Sensor;
@@ -14,6 +16,8 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -42,15 +46,14 @@ public class MoViSign extends Activity {
 	public static volatile float accelZ = (float)0;
 
 	private File root = null;
-	private File OrientationLog = null;
-	private File AccelerometerLog = null;
-	public BufferedWriter OrientationWriter = null ;
-	public BufferedWriter AccelerometerWriter = null;
+	private File OrientationTempLog = null;
+	private File AccelerometerTempLog = null;
+	public BufferedWriter OrientationTempWriter = null ;
+	public BufferedWriter AccelerometerTempWriter = null;
     private String TAG = "movisign";
-	
+    
 	public File addFile(String filename) throws Exception{
         File directory = new File(Environment.getExternalStorageDirectory().getPath()+"/movisign");
-
         if (!directory.exists()) {
                 directory.mkdir();
         }
@@ -70,50 +73,24 @@ public class MoViSign extends Activity {
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        root = Environment.getExternalStorageDirectory();
-        try {
-            OrientationLog = addFile("orientation.log");
-			AccelerometerLog = addFile("accelerometer.log");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        if (OrientationLog.exists() && OrientationLog.canWrite()){
-        	try {
-				OrientationWriter = new BufferedWriter(new FileWriter(OrientationLog));
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-        }
-        
-	    
-        if (AccelerometerLog.exists() && AccelerometerLog.canWrite()){
-        	try {
-				AccelerometerWriter = new BufferedWriter(new FileWriter(AccelerometerLog));
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-        }
-
+        logging = false;
         setContentView(R.layout.main);
         accuracyLabel = (TextView) findViewById(R.id.accuracyLabel);
         xLabel = (TextView) findViewById(R.id.xLabel);
         yLabel = (TextView) findViewById(R.id.yLabel);
         zLabel = (TextView) findViewById(R.id.zLabel);
-        startLogButton = (Button) findViewById(R.id.ButtonStartLog);
-        /*startLogButton.setOnClickListener(new OnClickListener(){
+        /*startLogButton = (Button) findViewById(R.id.ButtonStartLog);
+        startLogButton.setOnClickListener(new OnClickListener(){
         	public void onClick(View v) {
-        	    logging = true;
-        	  }
-        });*/
+        		//startLogging();
+        	}
+        });
         stopLogButton = (Button) findViewById(R.id.ButtonStopLog);
-        /*stopLogButton.setOnClickListener(new OnClickListener(){
-        	public void onClick(View v) {
-        	    logging = false;
-        	  }
+        stopLogButton.setOnClickListener(new OnClickListener(){
+        	public void onClick(View v){
+        		//stopLogging();
+            	//saveFile(true, "Gene");
+        	}
         });*/
         directionLabel = (TextView) findViewById(R.id.directionLabel);
         inclinationLabel = (TextView) findViewById(R.id.inclinationLabel);
@@ -127,43 +104,69 @@ public class MoViSign extends Activity {
         } else{
         	accelSupported = false;
         }
-       
-    	sensorMgr.registerListener(mySensorListener,
- 			   sensorMgr.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
- 			   SensorManager.SENSOR_DELAY_FASTEST);
-    	sensorMgr.registerListener(mySensorListener, 
-    		   sensorMgr.getDefaultSensor(Sensor.TYPE_ORIENTATION), 
- 			   SensorManager.SENSOR_DELAY_FASTEST);
-
-
-
-
+        
     }
+	public void saveFile(boolean correctness, String name){
+		if( (OrientationTempLog != null) && (AccelerometerTempLog != null)){
+			Date date = new Date();
+			try {
+				OrientationTempLog.renameTo(addFile("Orientation_"+ name + "_" + correctness + "_" + date.getTime()+".log") );
+				AccelerometerTempLog.renameTo(addFile("accelerometer_"+ name + "_" + correctness + "_" + date.getTime()+".log") );
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			Log.d(TAG, "save log file");
+		}
+	}
+	public void startLogging(){
+		if( logging == false){
+			try {
+				OrientationTempLog = addFile("Orientation.temp");
+				AccelerometerTempLog =  addFile("Accelerometer.temp");
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+	        if (OrientationTempLog.exists() && OrientationTempLog.canWrite()){
+	        	try {
+					OrientationTempWriter = new BufferedWriter(new FileWriter(OrientationTempLog));
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	        }
+	        
+		    
+	        if (AccelerometerTempLog.exists() && AccelerometerTempLog.canWrite()){
+	        	try {
+					AccelerometerTempWriter = new BufferedWriter(new FileWriter(AccelerometerTempLog));
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	        }
+	        logging = true;
+	        Log.d(TAG, "start logging");
+		}
+	}
 	
-    /*private void updateScreen(float x, float y, float z, float direction, float inclination, float aboveOrBelow)
-    {
-	     float thisX = x - oldX * 10;
-	     float thisY = y - oldY * 10;
-	     float thisZ = z - oldZ * 10;
- 
-    	
-		 xLabel.setText(String.format("X: %+2.5f (%+2.5f)", (x), oldX));
-		 yLabel.setText(String.format("Y: %+2.5f (%+2.5f)", (y), oldY));
-		 zLabel.setText(String.format("Z: %+2.5f (%+2.5f)", (z), oldZ));
-		 
-		 directionLabel.setText(String.format("Direction: %+2.5f", direction));
-		 inclinationLabel.setText(String.format("Inclination: %+2.5f", inclination));
-		 if(aboveOrBelow > 0 ){
-			 aboveBelowLabel.setText("Up");
-		 }else{
-			 aboveBelowLabel.setText("Down");
-		 }
-	
-    	Log.v("movisign" , "vals " + x + ", " + y + ", "+z);
-	    oldX = x;
-	    oldY = y;
-	    oldZ = z;
-    }*/
+	public void stopLogging(){
+		if (logging == true){
+			logging = false;
+			
+			try {
+				OrientationTempWriter.close();
+				AccelerometerTempWriter.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			Log.d(TAG, "stop logging");
+		}
+		
+	}
     private final SensorEventListener mySensorListener = new SensorEventListener()
     {
     	 public void onSensorChanged(SensorEvent event)
@@ -178,11 +181,16 @@ public class MoViSign extends Activity {
 	             roll = (float) ((vals[2] * kFilteringFactor) + 
 	 	                (roll * (1.0 - kFilteringFactor)));
 	             
-	             
 	            try {
-	            	OrientationWriter.write(azimuth + " " + pitch + " " + roll + "\n");
-				} catch (IOException e) {
+	            	if(logging == true){
+	            	   Date temp = new Date();
+	                   OrientationTempWriter.write(azimuth + " " + pitch + " " + roll + " " + temp.getTime() + "\n");
+	            	}
+	            } catch (IOException e) {
 					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}catch(NullPointerException e){
+					Log.e(TAG, e.getCause().getMessage());
 					e.printStackTrace();
 				}
 	             
@@ -196,32 +204,22 @@ public class MoViSign extends Activity {
     			 accelZ = (float) ((vals[2] * kFilteringFactor) + 
     		 	                (accelZ * (1.0 - kFilteringFactor)));
     			 
-    			 try {
-    				 
-    				 AccelerometerWriter.write(accelX + " " + accelY + " " + accelZ + "\n");
- 				} catch (IOException e) {
+    			try {
+    				 if( logging == true ){
+        				 Date temp = new Date();
+    					 AccelerometerTempWriter.write(accelX + " " + accelY + " " + accelZ + " " + temp.getTime() + "\n");
+    				 }
+    			} catch (IOException e) {
  					// TODO Auto-generated catch block
  					e.printStackTrace();
- 				}
+ 				}catch(NullPointerException e){
+ 					Log.e(TAG, e.getCause().getMessage());
+					e.printStackTrace();
+				}
              }
 	     }
 	     
-	     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-	    	 /*switch (accuracy) {
-				case SENSOR_STATUS_UNRELIABLE:
-					accuracyLabel.setText(R.string.accuracyUnreliable);
-					break;
-				case SENSOR_STATUS_ACCURACY_LOW:
-					accuracyLabel.setText(R.string.accuracyLow);
-					break;
-				case SENSOR_STATUS_ACCURACY_MEDIUM:
-					accuracyLabel.setText(R.string.accuracyMedium);
-					break;
-				case SENSOR_STATUS_ACCURACY_HIGH:
-					accuracyLabel.setText(R.string.accuracyHigh);
-					break;
-			 }*/
-	     }
+	     public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 
 
 		
@@ -231,27 +229,29 @@ public class MoViSign extends Activity {
     protected void onResume()
     {
     	super.onResume();
-    	Log.d(TAG,"resuming");
-    	//sensorMgr.registerListener(mySensorListener, accSensor, SensorManager.SENSOR_DELAY_GAME);   
+
+       	sensorMgr.registerListener(mySensorListener,
+  			   sensorMgr.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+  			   SensorManager.SENSOR_DELAY_FASTEST);
+     	sensorMgr.registerListener(mySensorListener, 
+     		   sensorMgr.getDefaultSensor(Sensor.TYPE_ORIENTATION), 
+  			   SensorManager.SENSOR_DELAY_FASTEST);
+
+    	
 		if (!accelSupported) {
-			// on accelerometer on this device
 			accuracyLabel.setText(R.string.noAccelerometer);
 		}
     }
     
-   
+    protected void onPause(){
+    	super.onPause();
+    }
+    
     @Override
     protected void onStop()
-    {     
-    	try {
-			OrientationWriter.close();
-			AccelerometerWriter.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    	
+    {         	
     	sensorMgr.unregisterListener(mySensorListener);
-     super.onStop();
+    	super.onStop();
+
     } 
 }
