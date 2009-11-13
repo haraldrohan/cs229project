@@ -48,8 +48,10 @@ public class MoViSign extends Activity {
 	private File root = null;
 	private File OrientationTempLog = null;
 	private File AccelerometerTempLog = null;
+	private File MergedTempLog = null;
 	public BufferedWriter OrientationTempWriter = null ;
 	public BufferedWriter AccelerometerTempWriter = null;
+	public BufferedWriter MergedTempWriter = null;
     private String TAG = "movisign";
     
 	public File addFile(String filename) throws Exception{
@@ -79,19 +81,19 @@ public class MoViSign extends Activity {
         xLabel = (TextView) findViewById(R.id.xLabel);
         yLabel = (TextView) findViewById(R.id.yLabel);
         zLabel = (TextView) findViewById(R.id.zLabel);
-        /*startLogButton = (Button) findViewById(R.id.ButtonStartLog);
+        startLogButton = (Button) findViewById(R.id.ButtonStartLog);
         startLogButton.setOnClickListener(new OnClickListener(){
         	public void onClick(View v) {
-        		//startLogging();
+        		startLogging();
         	}
         });
         stopLogButton = (Button) findViewById(R.id.ButtonStopLog);
         stopLogButton.setOnClickListener(new OnClickListener(){
         	public void onClick(View v){
-        		//stopLogging();
-            	//saveFile(true, "Gene");
+        		stopLogging();
+            	saveFile(true, "Gene");
         	}
-        });*/
+        });
         directionLabel = (TextView) findViewById(R.id.directionLabel);
         inclinationLabel = (TextView) findViewById(R.id.inclinationLabel);
         aboveBelowLabel = (TextView) findViewById(R.id.aboveBelowLabel);
@@ -112,6 +114,7 @@ public class MoViSign extends Activity {
 			try {
 				OrientationTempLog.renameTo(addFile("Orientation_"+ name + "_" + correctness + "_" + date.getTime()+".log") );
 				AccelerometerTempLog.renameTo(addFile("accelerometer_"+ name + "_" + correctness + "_" + date.getTime()+".log") );
+				MergedTempLog.renameTo(addFile("merged_"+ name + "_" + correctness + "_" + date.getTime()+".log") );			
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -124,6 +127,7 @@ public class MoViSign extends Activity {
 			try {
 				OrientationTempLog = addFile("Orientation.temp");
 				AccelerometerTempLog =  addFile("Accelerometer.temp");
+				MergedTempLog = addFile("Merged.temp");
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -147,6 +151,16 @@ public class MoViSign extends Activity {
 					e.printStackTrace();
 				}
 	        }
+	        
+	        if (MergedTempLog.exists() && MergedTempLog.canWrite()){
+	        	try {
+					MergedTempWriter = new BufferedWriter(new FileWriter(MergedTempLog));
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	        }
+	        
 	        logging = true;
 	        Log.d(TAG, "start logging");
 		}
@@ -159,6 +173,7 @@ public class MoViSign extends Activity {
 			try {
 				OrientationTempWriter.close();
 				AccelerometerTempWriter.close();
+				MergedTempWriter.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -185,6 +200,8 @@ public class MoViSign extends Activity {
 	            	if(logging == true){
 	            	   Date temp = new Date();
 	                   OrientationTempWriter.write(azimuth + " " + pitch + " " + roll + " " + temp.getTime() + "\n");
+	                   MergedTempWriter.write(azimuth + " " + pitch + " " + roll + " " + accelX + " " + accelY + " " + accelZ + " " + temp.getTime() + "\n");
+
 	            	}
 	            } catch (IOException e) {
 					// TODO Auto-generated catch block
@@ -208,6 +225,7 @@ public class MoViSign extends Activity {
     				 if( logging == true ){
         				 Date temp = new Date();
     					 AccelerometerTempWriter.write(accelX + " " + accelY + " " + accelZ + " " + temp.getTime() + "\n");
+    					 MergedTempWriter.write(azimuth + " " + pitch + " " + roll + " " + accelX + " " + accelY + " " + accelZ + " " + temp.getTime() + "\n");
     				 }
     			} catch (IOException e) {
  					// TODO Auto-generated catch block
