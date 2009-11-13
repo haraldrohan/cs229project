@@ -1,5 +1,9 @@
 package edu.stanford.movisign;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 import android.app.Activity;
 import android.content.Context;
@@ -8,9 +12,8 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -30,15 +33,70 @@ public class MoViSign extends Activity {
     private boolean logging = false;
     
   	public static volatile float kFilteringFactor = (float)0.05;
-	public static volatile float direction = (float) 0;
-	public static volatile float inclination = 0;
-	public static volatile float rollingZ = (float)0;
-	public static float aboveOrBelow = (float)0;
+	public static volatile float azimuth = (float) 0;
+	public static volatile float pitch = (float) 0;
+	public static volatile float roll = (float)0;
 
-    
+	public static volatile float accelX = (float) 0;
+	public static volatile float accelY = (float) 0;
+	public static volatile float accelZ = (float)0;
+
+	private File root = null;
+	private File OrientationLog = null;
+	private File AccelerometerLog = null;
+	public BufferedWriter OrientationWriter = null ;
+	public BufferedWriter AccelerometerWriter = null;
+    private String TAG = "movisign";
+	
+	public File addFile(String filename) throws Exception{
+        File directory = new File(Environment.getExternalStorageDirectory().getPath()+"/movisign");
+
+        if (!directory.exists()) {
+                directory.mkdir();
+        }
+
+        File logfile = new File(directory.getPath()+"/"+filename);
+        if (!logfile.exists() && directory.exists()){
+                try {
+                    logfile.createNewFile();
+                } catch (IOException e) {
+                        Log.d(TAG,"File creation failed for " + logfile);
+                }
+        }
+        return logfile;
+    }
+
+	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        root = Environment.getExternalStorageDirectory();
+        try {
+            OrientationLog = addFile("orientation.log");
+			AccelerometerLog = addFile("accelerometer.log");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        if (OrientationLog.exists() && OrientationLog.canWrite()){
+        	try {
+				OrientationWriter = new BufferedWriter(new FileWriter(OrientationLog));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        }
+        
+	    
+        if (AccelerometerLog.exists() && AccelerometerLog.canWrite()){
+        	try {
+				AccelerometerWriter = new BufferedWriter(new FileWriter(AccelerometerLog));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        }
 
         setContentView(R.layout.main);
         accuracyLabel = (TextView) findViewById(R.id.accuracyLabel);
@@ -82,14 +140,14 @@ public class MoViSign extends Activity {
 
     }
 	
-    private void updateScreen(float x, float y, float z, float direction, float inclination, float aboveOrBelow)
+    /*private void updateScreen(float x, float y, float z, float direction, float inclination, float aboveOrBelow)
     {
-	     /*float thisX = x - oldX * 10;
+	     float thisX = x - oldX * 10;
 	     float thisY = y - oldY * 10;
-	     float thisZ = z - oldZ * 10;*/
+	     float thisZ = z - oldZ * 10;
  
     	
-		 /*xLabel.setText(String.format("X: %+2.5f (%+2.5f)", (x), oldX));
+		 xLabel.setText(String.format("X: %+2.5f (%+2.5f)", (x), oldX));
 		 yLabel.setText(String.format("Y: %+2.5f (%+2.5f)", (y), oldY));
 		 zLabel.setText(String.format("Z: %+2.5f (%+2.5f)", (z), oldZ));
 		 
@@ -99,56 +157,53 @@ public class MoViSign extends Activity {
 			 aboveBelowLabel.setText("Up");
 		 }else{
 			 aboveBelowLabel.setText("Down");
-		 }*/
+		 }
 	
     	Log.v("movisign" , "vals " + x + ", " + y + ", "+z);
 	    oldX = x;
 	    oldY = y;
 	    oldZ = z;
-    }
+    }*/
     private final SensorEventListener mySensorListener = new SensorEventListener()
     {
-
     	 public void onSensorChanged(SensorEvent event)
 	     {
     		  float vals[] = event.values;
 	          if(event.sensor.getType() == Sensor.TYPE_ORIENTATION)
 	          {
-	             float rawDirection = vals[0];
-
-	             direction =(float) ((rawDirection * kFilteringFactor) + 
-	                (direction * (1.0 - kFilteringFactor)));
-
-	             inclination = 
-	                (float) ((vals[2] * kFilteringFactor) + 
-	                (inclination * (1.0 - kFilteringFactor)));
-
-	                    
-	              if(aboveOrBelow > 0)
-	                 inclination = inclination * -1;
-	              
-	             if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
-	             {
-	                aboveOrBelow =
-	                   (float) ((vals[2] * kFilteringFactor) + 
-	                   (aboveOrBelow * (1.0 - kFilteringFactor)));
-	  	            updateScreen(event.values[SensorManager.DATA_X],
-		                    event.values[SensorManager.DATA_Y],
-		                    event.values[SensorManager.DATA_Z], direction, inclination, aboveOrBelow);
-
-	             }
+	             azimuth =(float) ((vals[0] * kFilteringFactor) + 
+	                (azimuth * (1.0 - kFilteringFactor)));
+	             pitch = (float) ((vals[1] * kFilteringFactor) + 
+	                (pitch * (1.0 - kFilteringFactor)));
+	             roll = (float) ((vals[2] * kFilteringFactor) + 
+	 	                (roll * (1.0 - kFilteringFactor)));
+	             
+	             
+	            try {
+	            	OrientationWriter.write(azimuth + " " + pitch + " " + roll + "\n");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 	             
 	          }
     		 if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
              {
-                aboveOrBelow =
-                   (float) ((vals[2] * kFilteringFactor) + 
-                   (aboveOrBelow * (1.0 - kFilteringFactor)));
-  	            updateScreen(event.values[SensorManager.DATA_X],
-	                    event.values[SensorManager.DATA_Y],
-	                    event.values[SensorManager.DATA_Z], direction, inclination, aboveOrBelow);
+    			 accelX =(float) ((vals[0] * kFilteringFactor) + 
+    		                (accelX * (1.0 - kFilteringFactor)));
+    			 accelY = (float) ((vals[1] * kFilteringFactor) + 
+    		                (accelY * (1.0 - kFilteringFactor)));
+    			 accelZ = (float) ((vals[2] * kFilteringFactor) + 
+    		 	                (accelZ * (1.0 - kFilteringFactor)));
+    			 
+    			 try {
+    				 
+    				 AccelerometerWriter.write(accelX + " " + accelY + " " + accelZ + "\n");
+ 				} catch (IOException e) {
+ 					// TODO Auto-generated catch block
+ 					e.printStackTrace();
+ 				}
              }
-
 	     }
 	     
 	     public void onAccuracyChanged(Sensor sensor, int accuracy) {
@@ -167,13 +222,16 @@ public class MoViSign extends Activity {
 					break;
 			 }*/
 	     }
+
+
+		
     };
    
     @Override
     protected void onResume()
     {
     	super.onResume();
-    	Log.d("movisign","resuming");
+    	Log.d(TAG,"resuming");
     	//sensorMgr.registerListener(mySensorListener, accSensor, SensorManager.SENSOR_DELAY_GAME);   
 		if (!accelSupported) {
 			// on accelerometer on this device
@@ -185,6 +243,14 @@ public class MoViSign extends Activity {
     @Override
     protected void onStop()
     {     
+    	try {
+			OrientationWriter.close();
+			AccelerometerWriter.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
     	sensorMgr.unregisterListener(mySensorListener);
      super.onStop();
     } 
