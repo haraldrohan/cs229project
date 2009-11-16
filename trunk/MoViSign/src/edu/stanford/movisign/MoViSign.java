@@ -16,20 +16,23 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
+import android.view.View.OnTouchListener;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 
 public class MoViSign extends Activity {
     /** Called when the activity is first created. */
 	private SensorManager sensorMgr;
 	private TextView accuracyLabel;
-	private TextView xLabel, yLabel, zLabel, directionLabel, inclinationLabel, aboveBelowLabel;
+	private TextView xLabel, yLabel, zLabel, directionLabel, inclinationLabel, aboveBelowLabel, LogLabel;
 	private boolean accelSupported;
-    private Button startLogButton;
-    private Button stopLogButton;
+   /* private Button startLogButton;
+    private Button stopLogButton;*/
+    private ToggleButton LogButton = null;
+    
 	
     private List<Sensor> sensors;
     private Sensor accSensor;
@@ -81,6 +84,7 @@ public class MoViSign extends Activity {
         xLabel = (TextView) findViewById(R.id.xLabel);
         yLabel = (TextView) findViewById(R.id.yLabel);
         zLabel = (TextView) findViewById(R.id.zLabel);
+        LogLabel = (TextView) findViewById(R.id.LogLabel);
         /*startLogButton = (Button) findViewById(R.id.ButtonStartLog);
         startLogButton.setOnClickListener(new OnClickListener(){
         	public void onClick(View v) {
@@ -94,7 +98,29 @@ public class MoViSign extends Activity {
             	saveFile(true, "Gene");
         	}
         });*/
-        
+        LogButton = (ToggleButton) findViewById(R.id.LogButton);
+        LogButton.setOnTouchListener(new OnTouchListener() {
+            
+            public boolean onTouch(View v, MotionEvent event) {
+                 // TODO Auto-generated method stub
+                 
+                 if(event.getAction()==MotionEvent.ACTION_DOWN){
+                	 startLogging();
+                	 LogLabel.setText("Logging.....");
+                	 LogButton.setChecked(true);
+                	 LogButton.setText("Release to Stop Logging");
+                 }else if (event.getAction()==MotionEvent.ACTION_UP) {
+                	 LogLabel.setText("Stop Logging.....");
+                	 stopLogging();
+                 	 saveFile(true, "Default");
+                 	LogLabel.setText("Stopped");
+                 	LogButton.setChecked(false);
+                 	LogButton.setText("Click to Start Logging");
+                 }
+                 
+                 return true;
+            }
+       }); 
         directionLabel = (TextView) findViewById(R.id.directionLabel);
         inclinationLabel = (TextView) findViewById(R.id.inclinationLabel);
         aboveBelowLabel = (TextView) findViewById(R.id.aboveBelowLabel);
