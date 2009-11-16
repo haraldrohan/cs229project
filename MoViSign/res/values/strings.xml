@@ -17,6 +17,6 @@
 <string name="aboveBelowLabel">Up/Down:</string>
 
 
-<string name="startlog">Start Log</string>
-<string name="stoplog">Stop Log</string>
+<string name="startlog">Click to Start Logging</string>
+<string name="stoplog">Logging Stopped</string>
 </resources>
