@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">Hello World, MoViSign!</string>
+    <string name="hello">Welcome to MoviSign!</string>
     <string name="app_name">MoViSign</string>
 <string name="xlabel">X: </string>
 <string name="ylabel">Y: </string>

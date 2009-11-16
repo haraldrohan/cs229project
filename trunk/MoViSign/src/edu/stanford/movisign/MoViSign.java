@@ -81,7 +81,7 @@ public class MoViSign extends Activity {
         xLabel = (TextView) findViewById(R.id.xLabel);
         yLabel = (TextView) findViewById(R.id.yLabel);
         zLabel = (TextView) findViewById(R.id.zLabel);
-        startLogButton = (Button) findViewById(R.id.ButtonStartLog);
+        /*startLogButton = (Button) findViewById(R.id.ButtonStartLog);
         startLogButton.setOnClickListener(new OnClickListener(){
         	public void onClick(View v) {
         		startLogging();
@@ -93,7 +93,8 @@ public class MoViSign extends Activity {
         		stopLogging();
             	saveFile(true, "Gene");
         	}
-        });
+        });*/
+        
         directionLabel = (TextView) findViewById(R.id.directionLabel);
         inclinationLabel = (TextView) findViewById(R.id.inclinationLabel);
         aboveBelowLabel = (TextView) findViewById(R.id.aboveBelowLabel);
