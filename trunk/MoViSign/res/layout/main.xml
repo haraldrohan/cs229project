@@ -51,6 +51,6 @@
 			  android:textOff="@string/startlog" 
 			  android:textOn="@string/stoplog"
 			  android:clickable="true"
-			  android:soundEffectsEnabled="true" android:layout_height="fill_parent" android:layout_width="fill_parent"></ToggleButton>
+			  android:soundEffectsEnabled="true" android:layout_width="fill_parent" android:layout_height="fill_parent"></ToggleButton>
 
 </LinearLayout>
