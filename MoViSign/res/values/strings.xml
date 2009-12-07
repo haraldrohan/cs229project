@@ -19,4 +19,5 @@
 
 <string name="startlog">Click to Start Logging</string>
 <string name="stoplog">Logging Stopped</string>
+<string name="inputHint">Please input your name</string>
 </resources>
