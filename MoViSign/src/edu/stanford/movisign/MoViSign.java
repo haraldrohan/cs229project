@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -18,7 +19,10 @@ import android.os.Environment;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
@@ -31,6 +35,9 @@ public class MoViSign extends Activity {
 	private boolean accelSupported;
    /* private Button startLogButton;
     private Button stopLogButton;*/
+	private Button NameOKButton = null;
+	private Button SignSuccButton = null;
+	private Button SignFailButton =null;
     private ToggleButton LogButton = null;
     
 	
@@ -56,7 +63,10 @@ public class MoViSign extends Activity {
 	public BufferedWriter AccelerometerTempWriter = null;
 	public BufferedWriter MergedTempWriter = null;
     private String TAG = "movisign";
-    
+    private String SubjectName = null;
+    private Dialog inputName = null;
+    private Dialog checkDialog = null;
+    private EditText NameInputBox = null;
 	public File addFile(String filename) throws Exception{
         File directory = new File(Environment.getExternalStorageDirectory().getPath()+"/movisign");
         if (!directory.exists()) {
@@ -98,6 +108,42 @@ public class MoViSign extends Activity {
             	saveFile(true, "Gene");
         	}
         });*/
+        if (SubjectName == null){
+	        inputName = new Dialog(this); 
+	        inputName.setTitle("Tester's Name");
+	        inputName.setContentView(R.layout.dialog);
+	        inputName.show();
+	
+	        NameInputBox = (EditText) inputName.findViewById(R.id.TesterName); 
+	        NameInputBox.setSingleLine(true);
+	        NameOKButton = (Button) inputName.findViewById(R.id.ButtonNameOK);
+	        NameOKButton.setOnClickListener(new OnClickListener(){
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					SubjectName = NameInputBox.getText().toString();
+					inputName.dismiss();
+				}
+	        });
+        }
+        
+        checkDialog = new Dialog(this); 
+    	checkDialog.setTitle("Is this a successful signature?");
+    	checkDialog.setContentView(R.layout.successfail);
+    	SignSuccButton = (Button) checkDialog.findViewById(R.id.ButtonSucess);
+    	 SignSuccButton.setOnClickListener(new OnClickListener(){
+       	public void onClick(View v){
+       		saveFile(true, SubjectName);
+       		checkDialog.dismiss();
+       	}
+        });
+    	SignFailButton = (Button) checkDialog.findViewById(R.id.ButtonFail);
+    	SignFailButton.setOnClickListener(new OnClickListener(){
+       	public void onClick(View v){
+       		saveFile(false, SubjectName);
+       		checkDialog.dismiss();
+       	}
+        });
+        
         LogButton = (ToggleButton) findViewById(R.id.LogButton);
         LogButton.setOnTouchListener(new OnTouchListener() {
             
@@ -112,8 +158,12 @@ public class MoViSign extends Activity {
                  }else if (event.getAction()==MotionEvent.ACTION_UP) {
                 	 LogLabel.setText("Stop Logging.....");
                 	 stopLogging();
-                 	 saveFile(true, "Default");
-                 	LogLabel.setText("Stopped");
+                	 saveFile(true, SubjectName);
+                     
+                 	 
+                     checkDialog.show();
+                 	
+                    LogLabel.setText("Stopped");
                  	LogButton.setChecked(false);
                  	LogButton.setText("Click to Start Logging");
                  }
@@ -136,6 +186,9 @@ public class MoViSign extends Activity {
         
     }
 	public void saveFile(boolean correctness, String name){
+		if(name == null){
+			name = new String("Default");
+		}
 		if( (OrientationTempLog != null) && (AccelerometerTempLog != null)){
 			Date date = new Date();
 			try {
@@ -270,11 +323,11 @@ public class MoViSign extends Activity {
 		
     };
    
+    
     @Override
     protected void onResume()
     {
-    	super.onResume();
-
+    	super.onResume();	
        	sensorMgr.registerListener(mySensorListener,
   			   sensorMgr.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
   			   SensorManager.SENSOR_DELAY_FASTEST);
