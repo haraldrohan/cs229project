@@ -130,7 +130,7 @@ public class MoViSign extends Activity {
     	checkDialog.setTitle("Is this a successful signature?");
     	checkDialog.setContentView(R.layout.successfail);
     	SignSuccButton = (Button) checkDialog.findViewById(R.id.ButtonSucess);
-    	 SignSuccButton.setOnClickListener(new OnClickListener(){
+    	SignSuccButton.setOnClickListener(new OnClickListener(){
        	public void onClick(View v){
        		saveFile(true, SubjectName);
        		checkDialog.dismiss();
@@ -158,7 +158,7 @@ public class MoViSign extends Activity {
                  }else if (event.getAction()==MotionEvent.ACTION_UP) {
                 	 LogLabel.setText("Stop Logging.....");
                 	 stopLogging();
-                	 saveFile(true, SubjectName);
+                	 //saveFile(true, SubjectName);
                      
                  	 
                      checkDialog.show();
@@ -251,8 +251,12 @@ public class MoViSign extends Activity {
 			logging = false;
 			
 			try {
+				OrientationTempWriter.flush();
+
 				OrientationTempWriter.close();
+				AccelerometerTempWriter.flush();
 				AccelerometerTempWriter.close();
+				MergedTempWriter.flush();
 				MergedTempWriter.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -294,13 +298,26 @@ public class MoViSign extends Activity {
 	          }
     		 if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
              {
-    			 accelX =(float) ((vals[0] * kFilteringFactor) + 
+    			 /*accelX =(float) ((vals[0] * kFilteringFactor) + 
     		                (accelX * (1.0 - kFilteringFactor)));
     			 accelY = (float) ((vals[1] * kFilteringFactor) + 
     		                (accelY * (1.0 - kFilteringFactor)));
     			 accelZ = (float) ((vals[2] * kFilteringFactor) + 
-    		 	                (accelZ * (1.0 - kFilteringFactor)));
+    		 	                (accelZ * (1.0 - kFilteringFactor)));*/
     			 
+    			accelX =(float) vals[0];
+    			accelY =(float) vals[1];
+    			accelZ =(float) vals[2];
+    			
+                float adjX = (float) (9.8 * Math.sin(roll));
+                float adjY = (float) (9.8 * Math.sin(-pitch));
+                float adjZ = (float) (9.8 * Math.cos(roll) * Math.cos(pitch));
+                
+                accelX = accelX + adjX;
+                accelY = accelY + adjY;
+                accelZ = accelZ + adjZ;
+                
+                
     			try {
     				 if( logging == true ){
         				 Date temp = new Date();
