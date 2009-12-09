@@ -1,9 +1,9 @@
-basic_dir = './data/liu_train/';
+basic_dir = './data/king_train_new/';
 
 file_list = ls(strcat(basic_dir, 'merge*'));
 
 [str remained] = strtok(file_list);
-num_clusters = 32;
+num_clusters = 3;
 num_files = size(file_list, 1);
 X = zeros(num_clusters*6,num_files);
 y = zeros(1,num_files);
@@ -81,7 +81,55 @@ m = size(X, 2);
 %     result(i-1) = w'*testX + b;
 % end
 
-comparison = [result; y(2:m-1)];
+positive_index = (y == 1);
+positiveX = X(:,positive_index);
+positiveY = y(:,positive_index);
+negative_index = (y == -1);
+negativeX = X(:,negative_index);
+negativeY = y(:,negative_index);
+
+num_division = 20;
+pos_idx_step = size(positiveX, 2)/num_division;
+neg_idx_step = size(negativeX, 2)/num_division;
+positive_train_index = floor(pos_idx_step*(num_division-1));
+negative_train_index = floor(neg_idx_step*(num_division-1));
+%disp(positive_train_index + negative_train_index);
+
+result = [];
+reference = [];
+for i=1:num_division
+    disp(i);
+    pos_idx_start = floor(pos_idx_step * (i-1));
+    if pos_idx_start < 2
+        pos_idx_start = 2;
+    end
+    pos_idx_end = floor(pos_idx_step * i);
+    if pos_idx_end > m-1
+        pos_idx_end = m-1;
+    end
+    neg_idx_start = floor(neg_idx_step * (i-1));
+    if neg_idx_start < 2
+        neg_idx_start = 2;
+    end
+    neg_idx_end = floor(neg_idx_step * i);
+    if neg_idx_end > m-1
+        neg_idx_end = m-1;
+    end
+    
+    trainX = [positiveX(:,1:pos_idx_start-1) positiveX(:,pos_idx_end+1:size(positiveX,2)) negativeX(:,1:neg_idx_start-1) negativeX(:,neg_idx_end+1:size(negativeX,2))];
+    trainY = [positiveY(:,1:pos_idx_start-1) positiveY(:,pos_idx_end+1:size(positiveY,2)) negativeY(:,1:neg_idx_start-1) negativeY(:,neg_idx_end+1:size(negativeY,2))];
+    testX = [positiveX(:,pos_idx_start:pos_idx_end) negativeX(:,neg_idx_start:neg_idx_end)];
+    testY = [positiveY(:,pos_idx_start:pos_idx_end) negativeY(:,neg_idx_start:neg_idx_end)];
+
+    [w b] = MoViSign_training_SVM(trainX, trainY);
+    disp(w);
+    disp(b);
+    result = [result w'*testX + b];
+    reference = [reference testY];
+end
+
+% comparison = [result; y(2:m-1)];
+comparison = [result; reference];
 error_rate = sum((comparison(1,:) .* comparison(2,:)) < 0) / size(comparison, 2);
 disp(error_rate);
 
