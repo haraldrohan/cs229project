@@ -112,7 +112,8 @@ public class MoViSign extends Activity {
         // TODO: get W & b
 		double W[] = new double[NumOfCluster*6];
 		double b = 0;
-		File trainResult = new File(directory.getPath()+"/trainResault.txt");
+		File trainResult = new File(directory.getPath()+"/trainResult.txt");
+		Log.d(TAG, "file is at:" + directory.getPath()+"/trainResult.txt");
 		BufferedReader trainResultReader = null;
 		try {
 			trainResultReader = new BufferedReader(new FileReader(trainResult));
@@ -125,6 +126,7 @@ public class MoViSign extends Activity {
 			line = trainResultReader.readLine();
 			if(line!=null){
 				b = (double) Double.valueOf(line);
+				//Log.d(TAG, new String("B: " + b));
 			}
 			line = trainResultReader.readLine();
 		} catch (Exception e) {
@@ -132,17 +134,17 @@ public class MoViSign extends Activity {
 			e.printStackTrace();
 		}
 		int w = 0;
+		//Log.d(TAG, new String("W: "));
 		while(line != null){
-			StringTokenizer st = new StringTokenizer(line);
-			while (st.hasMoreTokens()) {
-		         W[w] = (double) Double.valueOf(st.nextToken());
-		    }
+		    W[w] = (double) Double.valueOf(line);
+			//Log.d(TAG, new String( " " + W[w]));
 			try {
 				line = trainResultReader.readLine();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			w++;
 		}
 		// Processing Testing Data
 		int NumOfLine = 0;
@@ -160,15 +162,19 @@ public class MoViSign extends Activity {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		Log.d(TAG, new String("testing data: "));
+		Log.d(TAG, new String( "NumOfLine: " + NumOfLine));
 		double testData[][] = new double[NumOfLine][7];
-		int lineNum =0;
+		int lineNum = 0;
 		while(line != null){
 			lineNum++;
 			StringTokenizer st = new StringTokenizer(line);
 			int i=0;
 			while (st.hasMoreTokens()) {
-		         testData[lineNum-1][i] = (double) Double.valueOf(st.nextToken());
-		    }
+		        testData[lineNum-1][i] = (double) Double.valueOf(st.nextToken());
+		 		//Log.d(TAG, new String("lineNum: "+ (lineNum-1) + " i: "+ i + " testData[lineNum-1][i]: " + testData[lineNum-1][i]));
+		 		i++;
+			}
 			
 			try {
 				line = log.readLine();
@@ -179,32 +185,46 @@ public class MoViSign extends Activity {
 			}
 		}
 		
-	    int numInCluster = (int) Math.ceil((lineNum / NumOfCluster));
+	    //int numInCluster;
+	    double ClusterStep = (double)lineNum / (double)NumOfCluster;
 	    int k = 0;
+	    Log.d(TAG, new String("Cluster Step: " + ClusterStep));
+	    Log.d(TAG, new String("features: "));
 	    double featureData[][] = new double[NumOfCluster][6];
 	    double X[] = new double[NumOfCluster*6];
+	    int totalLineSoFar = 0;
 	    while (k < NumOfCluster){
-	    	for (int i = 0; i<6; i ++){
+	    	int numInThisCluster = (int) Math.floor((k+1)*ClusterStep) - (int)Math.floor(k*ClusterStep);
+	    	for (int i = 0; i<6; i++){
 	    		featureData[k][i] = 0;
 	    		int j = 0 ;
-	    		for(; j< numInCluster; j++){
-	    			lineNum = k*NumOfCluster + j;
+	    		int num = 0;
+	    		for(; j< numInThisCluster; j++){
+	    			lineNum = totalLineSoFar + j;
 	    			if(lineNum < NumOfLine){
 	    				featureData[k][i] += testData[lineNum][i];
+	    				//Log.d(TAG, "k: "+k + "i: "+ i + " lineNum: " + lineNum + " feature[k][i] = " +featureData[k][i] + " testData[lineNum][i]: "+ testData[lineNum][i]);
+	    				num++;
 	    			}else{
 	    				break;
 	    			}
 	    		}
-	    		featureData[k][i] /= j;
-	    	    X[k*6 + i] = featureData[k][i];
+	    		featureData[k][i] /= (double)num;
+	    		//if(num>0)
+	    		X[k*6 + i] = featureData[k][i];
+
+	    	    
 	    	}
 	    	k++;
+	    	totalLineSoFar += numInThisCluster;
 	    }
 	    double answer = 0;
 	    for(int i = 0; i< NumOfCluster*6;i++){
 	    	answer += W[i]*X[i];
+	    	Log.d(TAG, new String("i:" + i + " X[i]: " + X[i] + " W[i]: "+ W[i] + "answer: " + answer));
 	    }
 	    answer += b;
+	    Log.d(TAG, new String("answer: " + answer));
         return (answer>0);
 		
 	}
@@ -290,6 +310,7 @@ public class MoViSign extends Activity {
                  if(event.getAction()==MotionEvent.ACTION_DOWN){
                 	 startLogging();
                 	 LogLabel.setText("Logging.....");
+                	 testResultLabel.setText("Test Result:");
                 	 LogButton.setChecked(true);
                 	 LogButton.setText("Release to Stop Logging");
                  }else if (event.getAction()==MotionEvent.ACTION_UP) {
@@ -379,7 +400,7 @@ public class MoViSign extends Activity {
 	        }
 	        
 	        logging = true;
-	        Log.d(TAG, "start logging");
+	        //Log.d(TAG, "start logging");
 		}
 	}
 	
@@ -399,7 +420,7 @@ public class MoViSign extends Activity {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			Log.d(TAG, "stop logging");
+			//Log.d(TAG, "stop logging");
 		}
 		
 	}
