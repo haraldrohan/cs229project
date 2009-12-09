@@ -38,10 +38,10 @@ public class Accel extends Activity implements SensorListener{//, OnClickListene
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);        
         setContentView(R.layout.main);
-        accuracyLabel = (TextView) findViewById(R.id.accuracyLabel);
+        /*accuracyLabel = (TextView) findViewById(R.id.accuracyLabel);
         xLabel = (TextView) findViewById(R.id.xLabel);
         yLabel = (TextView) findViewById(R.id.yLabel);
-        zLabel = (TextView) findViewById(R.id.zLabel);
+        zLabel = (TextView) findViewById(R.id.zLabel);*/
         //calibrateButton = (Button) findViewById(R.id.calibrateButton);
         //calibrateButton.setOnClickListener(this);
     }
