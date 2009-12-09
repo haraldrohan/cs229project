@@ -1,6 +1,6 @@
 basic_dir = './data/liu_train/';
 
-file_list = ls(strcat(badic_dir, 'merge*'));
+file_list = ls(strcat(basic_dir, 'merge*'));
 
 [str remained] = strtok(file_list);
 num_clusters = 32;
