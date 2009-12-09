@@ -5,14 +5,15 @@ file_list = ls(strcat(basic_dir, 'merge*'));
 [str remained] = strtok(file_list);
 num_clusters = 32;
 num_files = size(file_list, 1);
-X = zeros(6,num_files);
+X = zeros(num_clusters*6,num_files);
 y = zeros(1,num_files);
 file_index = 1;
 
-while(strcmp(str,'')==0)
-    file_list = remained;
+while(file_index < num_files)
+    str = file_list(file_index,:);
+    str = strtok(str, ' ');
     file_name = strcat(basic_dir,str);
-    data = load(str);
+    data = load(strcat(basic_dir ,str));
     [a r] = strtok(str,'_');
     while( strcmp(a,'true')==0 && strcmp(a,'false')==0)
             [a r] = strtok(r,'_');
@@ -60,30 +61,25 @@ while(strcmp(str,'')==0)
     end
     X(:,file_index) = ordered_mat';
     
-    [str remained] = strtok(file_list);
     file_index = file_index + 1;
 end
 
 n = size(X, 1);
 m = size(X, 2);
 
-result = zeros(1, m-2);
-for i = 2
-trainX = [X(:, 1:i-1) X(:, i+1:m)];
-testX = X(:, i);
-trainY = [y(:, 1:i-1) y(:, i+1:m)];
-testY = y(:, i);
-
-%alpha = MoViSign_training_SVM(trainX, trainY);
-%[b alphas] = svm_train(trainX, trainY);
-%sum(alpha .* trainY' .* (trainX' * testX))
-
-[w b] = MoViSign_training_SVM(trainX, trainY);
-dips(w);
-disp(i);
-disp(b);
-result(i-1) = w'*testX + b;
-end
+% result = zeros(1, m-2);
+% for i = 2:m-1
+%     trainX = [X(:, 1:i-1) X(:, i+1:m)];
+%     testX = X(:, i);
+%     trainY = [y(:, 1:i-1) y(:, i+1:m)];
+%     testY = y(:, i);
+% 
+%     [w b] = MoViSign_training_SVM(trainX, trainY);
+%     disp(w);
+%     disp(i);
+%     disp(b);
+%     result(i-1) = w'*testX + b;
+% end
 
 comparison = [result; y(2:m-1)];
 error_rate = sum((comparison(1,:) .* comparison(2,:)) < 0) / size(comparison, 2);
