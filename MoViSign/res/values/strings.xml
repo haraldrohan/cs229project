@@ -20,4 +20,6 @@
 <string name="startlog">Click to Start Logging</string>
 <string name="stoplog">Logging Stopped</string>
 <string name="inputHint">Please input your name</string>
+<string name="TrueSignature">True Signature</string>
+<string name="FalseSignature">False Signature</string>
 </resources>
