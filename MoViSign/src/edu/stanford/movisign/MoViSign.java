@@ -96,7 +96,7 @@ public class MoViSign extends Activity {
     }
 
 	public boolean testSignature(){
-	/*	File directory = new File(Environment.getExternalStorageDirectory().getPath()+"/movisign");
+		File directory = new File(Environment.getExternalStorageDirectory().getPath()+"/movisign");
 		BufferedReader log = null;
 		
         if (!directory.exists()) {
@@ -205,8 +205,8 @@ public class MoViSign extends Activity {
 	    	answer += W[i]*X[i];
 	    }
 	    answer += b;
-        return (answer>0);*/
-		return true;
+        return (answer>0);
+		
 	}
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -271,13 +271,13 @@ public class MoViSign extends Activity {
     	TestButton = (Button) checkDialog.findViewById(R.id.ButtonTest);
     	TestButton.setOnClickListener(new OnClickListener(){
            	public void onClick(View v){
-           		/*boolean result = false;
+           		boolean result = false;
            		result = testSignature();
            		if(result == true){
            			testResultLabel.setText("True Signature");
            		}else{
            			testResultLabel.setText("False Signature");
-           		}*/
+           		}
            		checkDialog.dismiss();
            	}
         });
