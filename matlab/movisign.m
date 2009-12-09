@@ -1,14 +1,14 @@
 %cd('./data/flat');
-file_list = ls('./data/king/accele*');
+file_list = ls('./data/king_train/merge*');
 
 X = [];
 y = [];
 [str remained] = strtok(file_list);
-num_clusters = 16;
+num_clusters = 32;
 
 while(strcmp(str,'')==0)
     file_list = remained;
-    file_name = strcat('./data/king/',str);
+    file_name = strcat('./data/king_train/',str);
     data = load(str);
     [a r] = strtok(str,'_');
     while( strcmp(a,'true')==0 && strcmp(a,'false')==0)
@@ -24,8 +24,10 @@ while(strcmp(str,'')==0)
     accx = data(:,1); 
     accy = data(:,2); 
     accz = data(:,3);    
-    
-    timestamp = data(:,4) - data(1,4);
+    acca = data(:,4); 
+    accr = data(:,5); 
+    accp = data(:,6);  
+    timestamp = data(:,7) - data(1,7);
     
     sizet = size(timestamp, 1);
     timediff = [timestamp(2:sizet); 1];
@@ -59,7 +61,7 @@ while(strcmp(str,'')==0)
 %     aligned_mat = get_projection(new_data);
 %     aligned_mat = [aligned_mat(:,2:3) aligned_mat(:,1)];
     timestamp = timestamp ./ max(timestamp);
-    aligned_mat = [timestamp data(:, 1:3)];
+    aligned_mat = [timestamp data(:, 1:6)];
     %assigned_cluster = kmeans(aligned_mat, num_clusters);
     
     assigned_cluster = ceil((1:sizet)./(sizet / num_clusters));
@@ -77,6 +79,10 @@ while(strcmp(str,'')==0)
     ordered_mat = [ordered_mat mean(aligned_mat(assigned_cluster == IX(i),2))];
     ordered_mat = [ordered_mat mean(aligned_mat(assigned_cluster == IX(i),3))];
     ordered_mat = [ordered_mat mean(aligned_mat(assigned_cluster == IX(i),4))];
+    ordered_mat = [ordered_mat mean(aligned_mat(assigned_cluster == IX(i),5))];
+    ordered_mat = [ordered_mat mean(aligned_mat(assigned_cluster == IX(i),6))];
+    ordered_mat = [ordered_mat mean(aligned_mat(assigned_cluster == IX(i),7))];
+
     end
     X = [X ordered_mat'];
     
@@ -99,10 +105,22 @@ testY = y(:, i);
 
 [w b] = MoViSign_training_SVM(trainX, trainY);
 w
+    disp(i);
 b
 result = [result w'*testX + b];
 end
 
-[result; y(2:m-1)]
+comparison = [result; y(2:m-1)];
+error_rate = sum((comparison(1,:) .* comparison(2,:)) < 0) / size(comparison, 2);
+disp(error_rate);
+
+negative = comparison(1 , comparison(2, :) == -1);
+false_positive_rate = sum(negative > 0) / size(negative, 2);
+disp(false_positive_rate);
+
+positive = comparison(1 , comparison(2, :) == 1);
+false_negative_rate = sum(positive < 0) / size(positive, 2);
+disp(false_negative_rate);
+
 
 
