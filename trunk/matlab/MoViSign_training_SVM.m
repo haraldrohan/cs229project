@@ -26,11 +26,14 @@ alpha = 0;
 % disp(alpha);
 % disp(t);
 
+C = 100;
+
 cvx_begin
-    variables b w(n);
-    minimize norm(w);
+    variables b w(n) k(m);
+    minimize norm(w)/2 + C * sum(k);
     subject to
+        k >= 0;
         for i=1:m
-            y(i) * (w'*X(:,i) + b) >= 1;
+            y(i) * (w'*X(:,i) + b) >= 1 - k(i);
         end
 cvx_end
