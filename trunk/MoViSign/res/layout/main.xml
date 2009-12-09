@@ -9,48 +9,24 @@
     android:layout_height="wrap_content" 
     android:text="@string/hello"
     />
-<TextView 
-	android:layout_width="wrap_content" 
-	android:layout_height="wrap_content" 
-	android:text="@string/accuracylabel" android:id="@+id/accuracyLabel"
-	/>
-<TextView 
-	android:layout_width="wrap_content" 
-	android:layout_height="wrap_content" 
-	android:text="@string/xlabel" android:id="@+id/xLabel"
-	/>
+
+
 	
-<TextView 
-	android:layout_width="wrap_content" 
-	android:layout_height="wrap_content" 
-	android:text="@string/ylabel" android:id="@+id/yLabel"
-	/>
 
-<TextView 
-	android:layout_width="wrap_content" 
-	android:layout_height="wrap_content" 
-	android:text="@string/zlabel" android:id="@+id/zLabel"
-	/>
 
-<TextView android:text="@string/directionLabel" 
-		  android:id="@+id/directionLabel" 
-		  android:layout_width="wrap_content" 
-		  android:layout_height="wrap_content"></TextView>
 
-<TextView android:text="@string/inclinationLabel" 
-		  android:id="@+id/inclinationLabel" 
-		  android:layout_width="wrap_content" 
-		  android:layout_height="wrap_content"></TextView>
 
-<TextView android:text="@string/aboveBelowLabel" 
-		  android:id="@+id/aboveBelowLabel" 
-		  android:layout_width="wrap_content" 
-		  android:layout_height="wrap_content"></TextView>
 
-<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/LogLabel" android:text="@string/stoplog"></TextView><ToggleButton android:id="@+id/LogButton" 
+
+
+
+
+
+<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/TestResultLabel" android:textSize="40sp" android:text="Test Result"></TextView><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/LogLabel" android:text="@string/stoplog"></TextView><ToggleButton android:id="@+id/LogButton" 
 			  android:textOff="@string/startlog" 
 			  android:textOn="@string/stoplog"
 			  android:clickable="true"
 			  android:soundEffectsEnabled="true" android:layout_width="fill_parent" android:layout_height="fill_parent"></ToggleButton>
+
 
 </LinearLayout>

@@ -8,4 +8,8 @@
 
 <Button android:layout_height="wrap_content" android:text="Success" android:layout_width="fill_parent" android:id="@+id/ButtonSucess"></Button>
 <Button android:layout_height="wrap_content" android:text="Fail" android:layout_width="fill_parent" android:id="@+id/ButtonFail"></Button>
+<Button android:layout_height="wrap_content" android:id="@+id/ButtonTest" android:text="Test" android:layout_width="fill_parent"></Button>
+
+
+
 </LinearLayout>
