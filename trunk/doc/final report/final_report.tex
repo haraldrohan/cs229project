@@ -1,0 +1,114 @@
+\documentclass[12pt]{article}
+\usepackage{graphicx}
+\usepackage{graphics}
+
+\title{MoViSign: A novel authentication mechanism using mobile virtual signatures}
+\author{Nikhil Handigol, Te-Yuan Huang, Gene Chi Liu}
+\date{}
+
+\begin{document}
+\maketitle
+
+
+\section{Introduction}
+
+Signatures are a popular means of authentication. They, ideally, are unique to a person and, therefore, hard to copy. Two common types of signatures are traditional "pen-on-paper" signatures and electronic signatures. Electronic signatures are done on a custom-built electronic board using a stylus. The electronic board records information such as pressure, acceleration, and angle of the stylus in addition to the standard signature "image". This information is used by a signature recognition system to differentiate authentic signatures from fraudulent ones. Both types of signatures have their drawbacks. While traditional "pen-on-paper" signatures are prone to forgery by expert humans, electronic signatures require a special electronic board to record the signature.
+
+In this project, we design and implement a novel mechanism of authentication, called mobile virtual signature, using mobile phones. Modern mobile phones such as the Apple iPhone and the Google G-phone are equipped with multiple sensors including accelerometers, orientation sensors, temperature sensors, proximity sensors, and multi-touch sensors. In our authentication mechanism, a person authenticates by signing "in the air" with the phone. The sensors on the phone, primarily the accelerometer, continuously record various parameters such as position, acceleration and angle. This information is then used by a Machine Learning program running on the mobile phone to recognize the signature.
+
+The authentication mechanism has several advantages. First, just like the traditional signatures, mobile virtual signatures stay unique to each person and can be changed if necessary. Second, it makes forgery hard as the signature is made "in the air" and without producing any tangible output to copy from. Third, it is hard to map the information collected by the accelerometers back to the actual physical movement that produced the signature. Finally, the mechanism uses popular mobile phones, and hence can be deployed on a large scale without additional cost.
+
+We have developed a prototype of the system on the Google G-phone. The G-phone runs the open source Android operating system which allows for easy development of new applications and reuse of components built by other developers.
+
+\section{System Design}
+
+We have implemented a Java application on Android to collect values from accelerometer and orientation sensors as our training set and run an SVM-based learning algorithm to classify authentic and non-authentic signatures.
+
+The values from the accelerometer sensor are defined in the accelerometer reference~\cite{}. We record acceleration in the X, Y and Z axes, whose positive directions are toward the right side, top, and front of the device respectively.
+
+The values from the orientation sensor are defined in the orientation sensor reference~\cite{}.
+We record three values from the orientation sensor~\cite{}:
+
+\begin{figure}[ht]
+\begin{minipage}[b]{0.33\textwidth}
+\centering
+\includegraphics[width=0.3\textwidth]{azimuth}
+\caption{Azimuth}
+\label{fig:azimuth}
+\end{minipage}
+\begin{minipage}[b]{0.33\textwidth}
+\centering
+\includegraphics[width=0.3\textwidth]{pitch}
+\caption{Pitch}
+\label{fig:pitch}
+\end{minipage}
+\begin{minipage}[b]{0.33\textwidth}
+\centering
+\includegraphics[width=0.3\textwidth]{roll}
+\caption{Roll}
+\label{fig:roll}
+\end{minipage}
+\end{figure}
+
+\begin{itemize}
+\item Azimuth - the angle in current reference to Magnetic North, ranges between [0. 360]. 
+\item Pitch - the degree to which the device is tilted forwards or backwards, ranges between [-180, 180].
+\item Roll - the rotation of the device in relation to the bottom left hand corner of the screen, ranges between [-90, 90].
+\end{itemize}
+
+Using this application, the user can create input samples and label them as "authentic" or "non-authentic". The application logs each input sample into a file, which is transferred to an external computer to run the machine learning algorithm offline.
+
+\section{User Interface}
+
+\begin{figure}[ht]
+\label{fig:gui}
+\begin{minipage}[b]{0.33\textwidth}
+\centering
+\includegraphics[width=0.3\textwidth]{name}
+\caption{Entering user name.}
+\label{fig:name}
+\end{minipage}
+\begin{minipage}[b]{0.33\textwidth}
+\centering
+\includegraphics[width=0.3\textwidth]{logging}
+\caption{Data logging.}
+\label{fig:logging}
+\end{minipage}
+\begin{minipage}[b]{0.33\textwidth}
+\centering
+\includegraphics[width=0.3\textwidth]{checkbox}
+\caption{Training/testing with the logged data}
+\label{fig:checkbox}
+\end{minipage}
+\end{figure}
+
+Figure~\ref{} shows the graphical user interface (GUI) of the MoViSign system. The user begins by giving her name as the input after which she will be presented with a "log" button. The user then signs her signature while holding the "log" button down, and then releases the button. After the signature logging, the user is presented with 3 options:
+\begin{itemize}
+\item Success - Use the logged data as an authentic signature to train the system.
+\item Fail - Use the logged data as an non-authentic signature to train the system.
+\item Test - Test the authenticity of the signature based on the training data.
+\end{itemize}
+
+\section{Training and Evaluation}
+
+\section{Related Work}
+
+Our authentication mechanism falls in the category of online signature recognition. Previous work on online signature recognition [4] uses position(x, y), pressure, and orientation of the stylus on the electronic board as the input features. The system stores preprocessed genuine signatures captured from each user. It then uses dynamic time warping and HMM models to compute the similarity between the new input signature and the stored genuine signatures.
+
+MoViSign differs from the previous work in terms of both the feature-set and the classification mechanism. MoViSign uses 3-D position, and orientation based on signatures generated by hand-gestures using mobile devices. It then uses supervised machine learning algorithm to classify signatures as aunthentic and fake ones.
+ 
+\section{Conclusion}
+
+Mobile virtual signature is a novel and potentially useful application of mobile phones. In this project, we designed and implemented the system using a simple SVM-based machine learning algorithm. Our results show that the algorithm does a good job of classifying signatures, with very low error rates.
+
+\end{document}
+
+
+References:
+
+[1] http://code.google.com/android/reference/android/hardware/SensorManager.html#SENSOR_ACCELEROMETER
+[2] http://code.google.com/android/reference/android/hardware/SensorManager.html#SENSOR_ORIENTATION
+[3] http://www.novoda.com/blog/?p=77
+[4] http://www.sciencedirect.com/science?_ob=ArticleURL&_udi=B6V14-4KJ0SHT-3&_user=145269&_rdoc=1&_fmt=&_orig=search&_sort=d&_docanchor=&view=c&_searchStrId=1055333803&_rerunOrigin=google&_acct=C000012078&_version=1&_urlVersion=0&_userid=145269&md5=5020c6826a21a1d225359a05d439dba5
+
+
