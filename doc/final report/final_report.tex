@@ -92,6 +92,22 @@ Figures~\ref{fig:name},~\ref{fig:logging}, and~\ref{fig:checkbox} show the graph
 
 \section{Training and Evaluation}
 
+Test Data:
+We generated about 400 signatures, including two of our group members' signatures (each of the two signed for about 100 times, respectively) as positive training data, and about 200 irrelevant patterns as negative training data.
+
+Feature Extraction:
+For each signature, we log the output of the accelerometer and orientation sensor and store them in increasing time order based on timestamp. We then devide the log data evenly into s segments (for s = 2,4,8,16,32.). For each segment, compute the mean of accelerometer (in x, y, z directions, respectively) and orientation sensor (in aziroth, pitch, roll, respectively) within it and use these six mean values as features for that data segment. Thus for each signature we have 6*s features.
+
+Training:
+We use SVM with linear kernel and L1 soft margin. Our SVM is implemented using CVX, a convex optimization problem solver built on MATLAB (http://www.stanford.edu/~boyd/cvx/). We use C = 100 for the L1 soft margin. We use a very large C here so that the alpha values will not be affected by L1 soft margin constraint in most cases.
+
+Evaluation:
+Our first attempt was to use Leave-one-out cross validation. As it took too much time to train and evaluate on every single test data, we also tried K-fold cross validation for K = 20 on larger data sets.
+
+Discussion:
+(relationships between number of segments and error rate)
+(the difference between leave-one-out and 20-fold cross validation)
+
 \section{Related Work}
 
 Our authentication mechanism falls in the category of online signature recognition. Previous work on online signature recognition~\cite{zanuy:2006} uses position(x, y), pressure, and orientation of the stylus on the electronic board as the input features. The system stores preprocessed genuine signatures captured from each user. It then uses dynamic time warping and HMM models to compute the similarity between the new input signature and the stored genuine signatures.
